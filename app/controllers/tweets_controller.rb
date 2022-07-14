@@ -4,12 +4,10 @@ class TweetsController < ApplicationController
     render 'tweets/index' # can be omitted
   end
 
-  def index_by_current_user
-    token = cookies.signed[:twitter_session_token]
-    session = Session.find_by(token: token)
-
-    if session
-      @tweets = session.user.tweets
+  def index_by_user
+    user = User.find_by(username: params[:username])
+    @tweets = Tweet.where(user_id: user.id)
+    if @tweets
       render 'tweets/index' # can be omitted
     else
       render json: { tweets: [] }
@@ -35,18 +33,26 @@ class TweetsController < ApplicationController
   end
 
   def destroy
-    @tweet = Tweet.find_by(id: params[:id])
+    token = cookies.signed[:twitter_session_token]
+    session = Session.find_by(token: token)
+
+    if session
+      user = session.user
+    @tweet = user.tweets.find_by(id: params[:id])
 
     if @tweet and @tweet.destroy
       render json: { success: true }
     else
       render json: { success: false }
     end
+  else
+    render json: { success: false }
   end
+ end
 
   private
 
     def tweet_params
-      params.require(:tweet).permit(:message)
+      params.require(:tweet).permit(:user, :message)
     end
 end

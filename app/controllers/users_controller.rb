@@ -6,7 +6,7 @@ class UsersController < ApplicationController
       render json: {
         user: {
           username: @user.username,
-          email: @user.email
+          email: @user.email,
         }
       } 
     else 

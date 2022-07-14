@@ -1,5 +1,5 @@
 class Session < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, required: true
 
   before_validation :generate_session_token
 
